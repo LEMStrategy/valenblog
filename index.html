@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article Studio — Write Once, Publish Everywhere</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #faf6ef;
+  --cream-dark: #f0e9db;
+  --ink: #1a1510;
+  --ink-light: #4a4540;
+  --ink-muted: #8a8278;
+  --red: #b5341a;
+  --red-light: #f0ddd9;
+  --gold: #c49a2a;
+  --gold-light: #f5eddb;
+  --green: #1a6b3a;
+  --green-light: #d9edd9;
+  --blue: #1a3a6b;
+  --blue-light: #d9e4f0;
+  --border: #ddd5c5;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1000;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--ink);
+  border-bottom: 1px solid #2a2a22;
+  padding: 0 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cream);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+.nav-logo span { color: var(--gold); }
+
+.nav-links {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 13px;
+  color: #aaa;
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.2s;
+  letter-spacing: 0.3px;
+}
+.nav-links a:hover { color: #fff; }
+
+.nav-cta {
+  background: var(--red) !important;
+  color: #fff !important;
+  padding: 8px 18px;
+  border-radius: 2px;
+  font-weight: 500 !important;
+}
+.nav-cta:hover { background: #9a2a14 !important; }
+
+/* ── HERO ── */
+#hero {
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 80px 40px;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 60% 70% at 70% 50%, #f5eddb 0%, transparent 70%),
+    linear-gradient(135deg, var(--cream) 0%, #ece4d4 100%);
+}
+
+.hero-lines {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 39px, var(--border) 39px, var(--border) 40px
+  );
+  opacity: 0.35;
+}
+
+.hero-content {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.hero-text {}
+
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 1px;
+  background: var(--red);
+}
+
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(48px, 6vw, 76px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+}
+h1 em {
+  font-style: italic;
+  color: var(--red);
+}
+
+.hero-sub {
+  font-size: 17px;
+  color: var(--ink-light);
+  line-height: 1.75;
+  margin-bottom: 36px;
+  font-weight: 300;
+  max-width: 440px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: var(--ink);
+  color: var(--cream);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: var(--red); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border: 1.5px solid var(--border);
+  color: var(--ink-light);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+.btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+/* Hero mockup */
+.hero-mockup {
+  position: relative;
+}
+
+.mockup-card {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 24px 64px rgba(26,21,16,0.15), 0 4px 12px rgba(26,21,16,0.08);
+  overflow: hidden;
+  transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+  transition: transform 0.4s ease;
+}
+.mockup-card:hover {
+  transform: perspective(1000px) rotateY(-1deg) rotateX(0deg);
+}
+
+.mockup-bar {
+  height: 36px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 6px;
+}
+.mockup-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.d1 { background: #ff5f57; }
+.d2 { background: #febc2e; }
+.d3 { background: #28c840; }
+
+.mockup-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 280px;
+}
+
+.mockup-editor {
+  background: #faf6ef;
+  padding: 16px;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.mockup-line {
+  height: 10px;
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
+.ml-h { background: var(--ink); width: 60%; height: 14px; margin-bottom: 14px; }
+.ml-1 { background: var(--border); width: 90%; }
+.ml-2 { background: var(--border); width: 80%; }
+.ml-3 { background: var(--border); width: 95%; }
+.ml-4 { background: var(--border); width: 70%; }
+.ml-5 { background: var(--red-light); width: 55%; height: 12px; margin-top: 12px; }
+.ml-6 { background: var(--border); width: 85%; }
+.ml-7 { background: var(--border); width: 75%; }
+
+.mockup-preview {
+  background: white;
+  padding: 16px;
+}
+.mp-h { background: var(--ink); width: 65%; height: 14px; margin-bottom: 14px; border-radius: 2px; }
+.mp-1 { background: #e8e0d0; width: 95%; height: 8px; margin-bottom: 7px; border-radius: 2px; }
+.mp-2 { background: #e8e0d0; width: 88%; height: 8px; margin-bottom: 7px; border-radius: 2px; }
+.mp-3 { background: #e8e0d0; width: 92%; height: 8px; margin-bottom: 7px; border-radius: 2px; }
+.mp-4 { background: #e8e0d0; width: 70%; height: 8px; margin-bottom: 14px; border-radius: 2px; }
+.mp-q { background: var(--red-light); width: 90%; height: 32px; border-left: 3px solid var(--red); border-radius: 0 2px 2px 0; padding-left: 8px; margin-bottom: 10px; display: flex; align-items: center; }
+
+/* ── SECTION BASE ── */
+section { padding: 90px 40px; }
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--ink-muted);
+}
+
+h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+h2 em { font-style: italic; color: var(--red); }
+
+.section-desc {
+  font-size: 16px;
+  color: var(--ink-light);
+  max-width: 520px;
+  line-height: 1.8;
+  font-weight: 300;
+  margin-bottom: 56px;
+}
+
+/* ── PLATFORMS ── */
+#platforms { background: var(--cream-dark); }
+
+.platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.platform-card {
+  background: var(--cream);
+  padding: 36px 32px;
+  transition: background 0.2s;
+}
+.platform-card:hover { background: white; }
+
+.platform-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.platform-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.platform-tagline {
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin-bottom: 20px;
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+}
+
+.platform-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+.tag-green { background: var(--green-light); color: var(--green); }
+.tag-blue { background: var(--blue-light); color: var(--blue); }
+.tag-gold { background: var(--gold-light); color: #7a5a10; }
+.tag-red { background: var(--red-light); color: var(--red); }
+
+.platform-pros {
+  list-style: none;
+  margin-bottom: 24px;
+}
+.platform-pros li {
+  font-size: 13px;
+  color: var(--ink-light);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--cream-dark);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+.platform-pros li::before {
+  content: '✓';
+  color: var(--green);
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.platform-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--ink);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1px;
+  transition: all 0.2s;
+  font-family: 'DM Mono', monospace;
+}
+.platform-link:hover { color: var(--red); border-color: var(--red); }
+
+/* ── BLOGSPOT GUIDE ── */
+#blogspot-guide { background: white; }
+
+.guide-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.guide-nav {
+  position: sticky;
+  top: 80px;
+}
+
+.guide-nav-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--ink-muted);
+  margin-bottom: 16px;
+}
+
+.guide-nav-items {
+  list-style: none;
+  border-left: 1px solid var(--border);
+}
+.guide-nav-item {
+  padding: 8px 0 8px 20px;
+  border-left: 2px solid transparent;
+  margin-left: -1px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.guide-nav-item:hover, .guide-nav-item.active {
+  border-left-color: var(--red);
+}
+.guide-nav-item a {
+  font-size: 13px;
+  color: var(--ink-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.guide-nav-item:hover a, .guide-nav-item.active a { color: var(--ink); }
+.guide-nav-step {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--ink-muted);
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.guide-steps { }
+
+.step-block {
+  padding: 40px 0;
+  border-bottom: 1px solid var(--cream-dark);
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 24px;
+  align-items: start;
+  animation: fadeIn 0.4s ease both;
+}
+.step-block:last-child { border-bottom: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  background: var(--ink);
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.step-number.red { background: var(--red); }
+.step-number.gold { background: var(--gold); }
+
+.step-content {}
+
+.step-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.step-desc {
+  font-size: 14px;
+  color: var(--ink-light);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  font-weight: 300;
+}
+
+.step-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.step-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 2px;
+  transition: all 0.2s;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.3px;
+}
+.step-btn-dark { background: var(--ink); color: var(--cream); }
+.step-btn-dark:hover { background: var(--red); }
+.step-btn-outline { border: 1.5px solid var(--border); color: var(--ink-light); }
+.step-btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+.step-btn-red { background: var(--red); color: white; }
+.step-btn-red:hover { background: #9a2a14; }
+.step-btn-green { background: var(--green); color: white; }
+.step-btn-green:hover { background: #145530; }
+
+.step-note {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--gold-light);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 2px 2px 0;
+  margin-top: 14px;
+}
+.step-note-icon { font-size: 14px; flex-shrink: 0; }
+.step-note-text {
+  font-size: 12px;
+  color: #5a4a10;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.step-info {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--blue-light);
+  border-left: 3px solid var(--blue);
+  border-radius: 0 2px 2px 0;
+  margin-top: 14px;
+}
+.step-info-text {
+  font-size: 12px;
+  color: #1a2a4a;
+  line-height: 1.6;
+}
+
+.code-snippet {
+  background: #1a1510;
+  color: #e8e0cc;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 14px 18px;
+  border-radius: 2px;
+  margin-top: 12px;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+}
+.code-snippet .c-key { color: #c49a2a; }
+.code-snippet .c-val { color: #7dbb8a; }
+.code-snippet .c-com { color: #666; font-style: italic; }
+
+.workflow-arrow {
+  text-align: center;
+  padding: 8px 0;
+  color: var(--ink-muted);
+  font-size: 20px;
+}
+
+/* ── WORKFLOW SECTION ── */
+#workflow { background: var(--ink); }
+
+#workflow .section-label { color: #555; }
+#workflow .section-label::before { background: #555; }
+#workflow h2 { color: var(--cream); }
+#workflow h2 em { color: var(--gold); }
+#workflow .section-desc { color: #888; }
+
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: #2a2520;
+  border: 1px solid #2a2520;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.workflow-card {
+  background: #141210;
+  padding: 32px 24px;
+  position: relative;
+}
+
+.wf-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 60px;
+  font-weight: 300;
+  color: #222;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.wf-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 10px;
+}
+
+.wf-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.wf-tag {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 1px;
+  margin-top: 14px;
+  letter-spacing: 0.5px;
+}
+
+.workflow-connector {
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  background: #1a1510;
+  border: 1px solid #2a2520;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #444;
+  font-size: 12px;
+  z-index: 2;
+}
+
+.workflow-cta {
+  margin-top: 48px;
+  text-align: center;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: #0d0b08;
+  padding: 48px 40px;
+  border-top: 1px solid #1a1a14;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cream);
+}
+.footer-logo span { color: var(--gold); }
+
+.footer-note {
+  font-size: 12px;
+  color: #444;
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.footer-link {
+  color: var(--red);
+  text-decoration: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  border: 1px solid var(--red);
+  padding: 8px 16px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+.footer-link:hover { background: var(--red); color: white; }
+
+/* ── ANIMATIONS ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .hero-content { grid-template-columns: 1fr; }
+  .hero-mockup { display: none; }
+  .platforms-grid { grid-template-columns: 1fr; }
+  .guide-layout { grid-template-columns: 1fr; }
+  .guide-nav { display: none; }
+  .workflow-grid { grid-template-columns: 1fr 1fr; }
+  nav { padding: 0 20px; }
+  section { padding: 60px 20px; }
+  #hero { padding: 60px 20px; }
+  .workflow-connector { display: none; }
+}
+
+@media (max-width: 600px) {
+  .workflow-grid { grid-template-columns: 1fr; }
+  .step-block { grid-template-columns: 1fr; }
+  .step-number { width: 36px; height: 36px; font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Article<span>·</span>Studio</a>
+  <ul class="nav-links">
+    <li><a href="#platforms">Platforms</a></li>
+    <li><a href="#blogspot-guide">Blogspot Guide</a></li>
+    <li><a href="#workflow">Workflow</a></li>
+    <li><a href="article-studio.html" class="nav-cta">Open Editor →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Write once, publish everywhere</div>
+      <h1>Your words.<br><em>Every platform.</em></h1>
+      <p class="hero-sub">
+        Article Studio gives you a focused writing environment and exports your content perfectly formatted for Reddit, Medium, Blogspot, and more — no reformatting, no hassle.
+      </p>
+      <div class="hero-actions">
+        <a href="article-studio.html" class="btn-primary">
+          <span>✍</span> Open the Editor
+        </a>
+        <a href="#blogspot-guide" class="btn-outline">
+          <span>📖</span> Blogspot Setup Guide
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-mockup">
+      <div class="mockup-card">
+        <div class="mockup-bar">
+          <div class="mockup-dot d1"></div>
+          <div class="mockup-dot d2"></div>
+          <div class="mockup-dot d3"></div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-editor">
+            <div class="mockup-line ml-h"></div>
+            <div class="mockup-line ml-1"></div>
+            <div class="mockup-line ml-2"></div>
+            <div class="mockup-line ml-3"></div>
+            <div class="mockup-line ml-4"></div>
+            <div class="mockup-line ml-5"></div>
+            <div class="mockup-line ml-6"></div>
+            <div class="mockup-line ml-7"></div>
+          </div>
+          <div class="mockup-preview">
+            <div class="mockup-line mp-h"></div>
+            <div class="mockup-line mp-1"></div>
+            <div class="mockup-line mp-2"></div>
+            <div class="mockup-line mp-3"></div>
+            <div class="mockup-line mp-4"></div>
+            <div class="mockup-line mp-q"></div>
+            <div class="mockup-line mp-1"></div>
+            <div class="mockup-line mp-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORMS -->
+<section id="platforms">
+  <div class="section-inner">
+    <div class="section-label reveal">Publishing Platforms</div>
+    <h2 class="reveal">Choose where your<br><em>story lives</em></h2>
+    <p class="section-desc reveal">Each platform has its own strengths, audience, and formatting needs. Here's how they compare — and how Article Studio exports perfectly for each.</p>
+
+    <div class="platforms-grid reveal">
+
+      <!-- Blogspot -->
+      <div class="platform-card">
+        <div class="platform-icon" style="background:#fff3e0;">🅱</div>
+        <div class="platform-name">Blogspot</div>
+        <div class="platform-tagline">Google's free blogging platform, since 2003</div>
+        <div class="platform-tags">
+          <span class="tag tag-green">Free forever</span>
+          <span class="tag tag-blue">Custom domain</span>
+          <span class="tag tag-gold">Google-owned</span>
+        </div>
+        <ul class="platform-pros">
+          <li>Completely free with google.com subdomain</li>
+          <li>Custom domain support (yourblog.com)</li>
+          <li>Google account — no new signup</li>
+          <li>Integrated with Google Analytics &amp; AdSense</li>
+          <li>Good SEO via Google indexing</li>
+          <li>Accepts raw HTML — paste from Article Studio</li>
+        </ul>
+        <a href="https://www.blogger.com" target="_blank" class="platform-link">blogger.com →</a>
+      </div>
+
+      <!-- Medium -->
+      <div class="platform-card">
+        <div class="platform-icon" style="background:#f0f0f0;">Ⓜ</div>
+        <div class="platform-name">Medium</div>
+        <div class="platform-tagline">The reading platform with built-in audience</div>
+        <div class="platform-tags">
+          <span class="tag tag-green">Large audience</span>
+          <span class="tag tag-red">Paywall option</span>
+          <span class="tag tag-blue">Clean design</span>
+        </div>
+        <ul class="platform-pros">
+          <li>Built-in readership &amp; discovery</li>
+          <li>Partner Program: earn from reads</li>
+          <li>Beautiful default typography</li>
+          <li>Accepts Markdown import</li>
+          <li>Publication system for branding</li>
+          <li>Great for essays &amp; long-form</li>
+        </ul>
+        <a href="https://medium.com/new-story" target="_blank" class="platform-link">medium.com →</a>
+      </div>
+
+      <!-- Reddit -->
+      <div class="platform-card">
+        <div class="platform-icon" style="background:#fff0ec;">🤖</div>
+        <div class="platform-name">Reddit</div>
+        <div class="platform-tagline">Community-driven discussion &amp; articles</div>
+        <div class="platform-tags">
+          <span class="tag tag-green">Viral potential</span>
+          <span class="tag tag-gold">Niche communities</span>
+          <span class="tag tag-blue">r/all reach</span>
+        </div>
+        <ul class="platform-pros">
+          <li>Massive built-in communities (subreddits)</li>
+          <li>Content can go viral instantly</li>
+          <li>Niche targeting via subreddits</li>
+          <li>Reddit Markdown — supported by Article Studio</li>
+          <li>Free &amp; instant publishing</li>
+          <li>Strong for technical &amp; opinion pieces</li>
+        </ul>
+        <a href="https://www.reddit.com/submit" target="_blank" class="platform-link">reddit.com →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- BLOGSPOT GUIDE -->
+<section id="blogspot-guide">
+  <div class="section-inner">
+    <div class="section-label reveal">Step-by-Step</div>
+    <h2 class="reveal">Setting up your<br><em>Blogspot blog</em></h2>
+    <p class="section-desc reveal">From zero to published in under 10 minutes. All you need is a Google account.</p>
+
+    <div class="guide-layout">
+
+      <!-- Sticky nav -->
+      <div class="guide-nav">
+        <div class="guide-nav-title">On this page</div>
+        <ul class="guide-nav-items">
+          <li class="guide-nav-item active">
+            <div class="guide-nav-step">Step 01</div>
+            <a href="#step1">Sign in to Blogger</a>
+          </li>
+          <li class="guide-nav-item">
+            <div class="guide-nav-step">Step 02</div>
+            <a href="#step2">Create your blog</a>
+          </li>
+          <li class="guide-nav-item">
+            <div class="guide-nav-step">Step 03</div>
+            <a href="#step3">Choose a theme</a>
+          </li>
+          <li class="guide-nav-item">
+            <div class="guide-nav-step">Step 04</div>
+            <a href="#step4">Write in Article Studio</a>
+          </li>
+          <li class="guide-nav-item">
+            <div class="guide-nav-step">Step 05</div>
+            <a href="#step5">Export as HTML</a>
+          </li>
+          <li class="guide-nav-item">
+            <div class="guide-nav-step">Step 06</div>
+            <a href="#step6">Paste &amp; Publish</a>
+          </li>
+          <li class="guide-nav-item">
+            <div class="guide-nav-step">Step 07</div>
+            <a href="#step7">Optional: Custom domain</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Steps -->
+      <div class="guide-steps">
+
+        <div class="step-block reveal" id="step1">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Go to Blogger and sign in</div>
+            <p class="step-desc">Blogspot is powered by Blogger — Google's free blogging platform. You only need a Google account (Gmail). No new account creation required.</p>
+            <div class="step-actions">
+              <a href="https://www.blogger.com" target="_blank" class="step-btn step-btn-dark">→ Go to Blogger.com</a>
+              <a href="https://accounts.google.com" target="_blank" class="step-btn step-btn-outline">Create Google Account</a>
+            </div>
+            <div class="step-note">
+              <div class="step-note-icon">💡</div>
+              <div class="step-note-text">Already have Gmail? You're already signed up. Just go to Blogger.com and click "Create your blog".</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-block reveal" id="step2">
+          <div class="step-number red">2</div>
+          <div class="step-content">
+            <div class="step-title">Create a new blog</div>
+            <p class="step-desc">Once signed in, click <strong>"Create your blog"</strong> (or the + New Blog button if you already have one). You'll be asked to:</p>
+            <ul style="font-size:13px;color:var(--ink-light);padding-left:18px;line-height:2;margin-bottom:12px;">
+              <li>Enter a <strong>Display Name</strong> — this is your author name</li>
+              <li>Give your blog a <strong>Title</strong> — e.g. "My Travel Journal"</li>
+              <li>Choose a <strong>URL</strong> — e.g. <code style="background:var(--cream-dark);padding:1px 5px;border-radius:2px;font-size:11px">mytravelblog.blogspot.com</code></li>
+            </ul>
+            <div class="step-info">
+              <div class="step-note-icon">ℹ</div>
+              <div class="step-info-text">Your blog address will be <strong>yourname.blogspot.com</strong> for free. You can connect a custom domain (like <em>yourname.com</em>) later in settings.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-block reveal" id="step3">
+          <div class="step-number gold">3</div>
+          <div class="step-content">
+            <div class="step-title">Pick a theme &amp; customize</div>
+            <p class="step-desc">From your Blogger dashboard, click <strong>Theme</strong> in the left sidebar. Choose a free theme or click <strong>Customize</strong> to change fonts, colors, and layout without coding.</p>
+            <div class="step-note">
+              <div class="step-note-icon">🎨</div>
+              <div class="step-note-text">Recommended themes for article-style blogs: <strong>Contempo</strong>, <strong>Soho</strong>, or <strong>Emporio</strong> — clean, readable, and mobile-friendly.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-block reveal" id="step4">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">Write your article in Article Studio</div>
+            <p class="step-desc">Open the Article Studio editor, write your article in Markdown. The live preview on the right shows exactly how your content looks formatted. Use headings, bold, lists, blockquotes — all will convert perfectly.</p>
+            <div class="step-actions">
+              <a href="article-studio.html" class="step-btn step-btn-red">✍ Open Article Studio</a>
+            </div>
+            <div class="step-note">
+              <div class="step-note-icon">💡</div>
+              <div class="step-note-text">Write freely in Markdown — don't worry about formatting. The export step will produce clean HTML automatically.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-block reveal" id="step5">
+          <div class="step-number red">5</div>
+          <div class="step-content">
+            <div class="step-title">Export as HTML from Article Studio</div>
+            <p class="step-desc">Once your article is ready, click the <strong>Export</strong> button in the editor header (or press <kbd style="background:var(--cream-dark);padding:2px 6px;border-radius:2px;font-family:'DM Mono',monospace;font-size:11px">Ctrl+E</kbd>). Then:</p>
+            <ol style="font-size:13px;color:var(--ink-light);padding-left:18px;line-height:2.2;margin-bottom:14px;">
+              <li>Switch to the <strong>HTML</strong> tab in the export dialog</li>
+              <li>Click <strong>"Copy to Clipboard"</strong></li>
+            </ol>
+            <div class="code-snippet">
+<span class="c-com">&lt;!-- Example of exported HTML from Article Studio --&gt;</span>
+<span class="c-key">&lt;h1&gt;</span><span class="c-val">My First Blog Post</span><span class="c-key">&lt;/h1&gt;</span>
+<span class="c-key">&lt;p&gt;</span>This is my intro paragraph...<span class="c-key">&lt;/p&gt;</span>
+<span class="c-key">&lt;h2&gt;</span><span class="c-val">A Section Title</span><span class="c-key">&lt;/h2&gt;</span>
+<span class="c-key">&lt;blockquote&gt;</span>An inspiring quote here.<span class="c-key">&lt;/blockquote&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-block reveal" id="step6">
+          <div class="step-number gold">6</div>
+          <div class="step-content">
+            <div class="step-title">Paste into Blogger &amp; Publish</div>
+            <p class="step-desc">In your Blogger dashboard, click <strong>New Post</strong>. The Blogger editor has two modes — you need to switch to HTML mode:</p>
+            <ol style="font-size:13px;color:var(--ink-light);padding-left:18px;line-height:2.2;margin-bottom:14px;">
+              <li>In the post editor, click the <strong>pencil icon</strong> (top-left of editor) → select <strong>"HTML view"</strong></li>
+              <li><strong>Paste</strong> the copied HTML (<kbd style="background:var(--cream-dark);padding:2px 5px;border-radius:2px;font-family:'DM Mono',monospace;font-size:10px">Ctrl+V</kbd>)</li>
+              <li>Switch back to <strong>"Compose view"</strong> to preview</li>
+              <li>Add a <strong>post title</strong>, set labels (tags), and add a featured image</li>
+              <li>Click <strong>"Publish"</strong> — you're live!</li>
+            </ol>
+            <div class="step-actions">
+              <a href="https://draft.blogger.com/blog/posts/new" target="_blank" class="step-btn step-btn-green">→ Create New Blogger Post</a>
+            </div>
+            <div class="step-info">
+              <div class="step-note-icon">ℹ</div>
+              <div class="step-info-text"><strong>Tip:</strong> After pasting HTML in Blogger, switch to Compose view to check formatting visually before publishing. You can also schedule posts for a future date.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-block reveal" id="step7">
+          <div class="step-number">7</div>
+          <div class="step-content">
+            <div class="step-title">Optional: Connect a Custom Domain</div>
+            <p class="step-desc">Upgrade your blog from <em>yourname.blogspot.com</em> to <em>yourname.com</em> for a more professional look. You'll need to purchase a domain from a registrar (Namecheap, Google Domains, GoDaddy).</p>
+            <ol style="font-size:13px;color:var(--ink-light);padding-left:18px;line-height:2.2;margin-bottom:14px;">
+              <li>In Blogger: go to <strong>Settings → Publishing → Custom domain</strong></li>
+              <li>Enter your domain name</li>
+              <li>Blogger shows you <strong>CNAME records</strong> to add to your domain's DNS</li>
+              <li>Add those records in your domain registrar's DNS settings</li>
+              <li>Wait 10–60 minutes for propagation</li>
+            </ol>
+            <div class="step-note">
+              <div class="step-note-icon">💡</div>
+              <div class="step-note-text">Domains typically cost $10–15/year. Blogger itself remains completely free even with a custom domain.</div>
+            </div>
+            <div class="step-actions">
+              <a href="https://www.namecheap.com" target="_blank" class="step-btn step-btn-outline">Namecheap</a>
+              <a href="https://domains.google.com" target="_blank" class="step-btn step-btn-outline">Google Domains</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="workflow">
+  <div class="section-inner">
+    <div class="section-label">Your Publishing Flow</div>
+    <h2>From idea to <em>published</em></h2>
+    <p class="section-desc">The complete workflow — write once in Article Studio, publish everywhere.</p>
+
+    <div class="workflow-grid">
+      <div class="workflow-card">
+        <div class="wf-num">01</div>
+        <div class="wf-title">Write</div>
+        <div class="wf-desc">Open Article Studio. Write your article in Markdown with live preview. Save drafts automatically.</div>
+        <div class="wf-tag" style="background:#1a1a00;color:var(--gold)">Article Studio</div>
+        <div class="workflow-connector">→</div>
+      </div>
+      <div class="workflow-card">
+        <div class="wf-num">02</div>
+        <div class="wf-title">Export</div>
+        <div class="wf-desc">Press Ctrl+E. Choose your format: HTML for Blogspot, Markdown for Medium, Reddit dialect for Reddit.</div>
+        <div class="wf-tag" style="background:#1a0a00;color:#e08060">Export Panel</div>
+        <div class="workflow-connector">→</div>
+      </div>
+      <div class="workflow-card">
+        <div class="wf-num">03</div>
+        <div class="wf-title">Copy &amp; Paste</div>
+        <div class="wf-desc">Copy to clipboard. Open your platform. Paste into the HTML editor, Markdown editor, or post composer.</div>
+        <div class="wf-tag" style="background:#001a0a;color:#60c080">Clipboard</div>
+        <div class="workflow-connector">→</div>
+      </div>
+      <div class="workflow-card">
+        <div class="wf-num">04</div>
+        <div class="wf-title">Publish</div>
+        <div class="wf-desc">Hit publish. Your article goes live — perfectly formatted for that platform's readers and algorithms.</div>
+        <div class="wf-tag" style="background:#000a1a;color:#6090e0">Live on Web</div>
+      </div>
+    </div>
+
+    <div class="workflow-cta">
+      <a href="article-studio.html" class="btn-primary" style="font-size:15px;padding:16px 36px;">
+        ✍ &nbsp;Start Writing Now
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Article<span>·</span>Studio</div>
+    <div class="footer-note">Write once. Publish everywhere. No account needed.</div>
+    <a href="article-studio.html" class="footer-link">Open Editor →</a>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Guide nav active state
+const steps = document.querySelectorAll('.step-block');
+const navItems = document.querySelectorAll('.guide-nav-item');
+
+const stepObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      navItems.forEach(n => {
+        n.classList.remove('active');
+        if (n.querySelector('a')?.getAttribute('href') === '#' + id) {
+          n.classList.add('active');
+        }
+      });
+    }
+  });
+}, { threshold: 0.5 });
+
+steps.forEach(s => stepObserver.observe(s));
+</script>
+</body>
+</html>
